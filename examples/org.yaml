@@ -1,0 +1,39 @@
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-user
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: Prayankag
+spec:
+  memberOf: [guests]
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: prayanka.gochipatula
+  annotations:
+    microsoft.com/azure-active-directory/object-id: "0ca98645-9fc4-4a65-8164-2fa9f832ea34"
+spec:
+  profile:
+    displayName: Prayanka Gochipatula
+    email: prayanka.gochipatula@valuemomentum.net
+  memberOf:
+    - backstage
+---
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: raghavendra-vam
+spec:
+  profile:
+    displayName: Raghavendra Lakkamaraju
+    email: raghavendra.lakkamaraju@valuemomentum.com
+  memberOf: [guests]
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: guests
+spec:
+  type: team
+  children: []

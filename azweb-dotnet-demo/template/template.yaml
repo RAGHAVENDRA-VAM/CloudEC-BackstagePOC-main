@@ -1,0 +1,125 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: provision-azweb-deploy-dotnetapp
+  title: Provision Azure WebApp & Deploy .NET
+  description: Provision Azure webapp to deploy .net application
+  tags: ['dotnet', 'azure', 'webapp']
+spec:
+  owner: prayankag
+  type: service
+  parameters:
+    - title: Backstage Input
+      required:
+        - name
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the Backstage catalog app
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        description:
+          title: A short description of the module - put full details in the README!
+          type: string
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+    - title: webapp deploy and Task Definition
+      required:
+         - resourcetype
+         - environment
+         - appname
+      properties:
+        resourcetype:
+          title: resourcetype
+          type: string
+          description: resourcetype to deploy (e.g., VM , Webapp)
+        environment:
+          title: environment
+          type: string
+          description: Environment to deploy (e.g., dev, prod)
+          enum:
+            - dev
+            - stag
+            - prod
+        appname:
+          title: WebApp Name
+          type: string
+          description: WebApp name to deploy .Net application
+    - title: Choose a Repository Location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Location of the repository
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    # Fetching the template details
+    - id: fetch-base
+      name: Fetching Details from Content Folder
+      action: fetch:template
+      input:
+        url: https://github.com/Prayankag/webappdotnet/tree/main/
+        values:
+          appname: ${{ parameters.appname }}
+          repo_name: ${{ (parameters.repoUrl | parseRepoUrl)["repo"] }}
+          repo_owner: ${{ (parameters.repoUrl | parseRepoUrl)["owner"] }}
+
+    # Publish the content to GitHub
+    - id: publish-temp
+      name: Publishing Details to main branch
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: This repo is to create a webapp ${{ parameters.appname }} using Backstage.
+        repoUrl: ${{ parameters.repoUrl }}  # Ensure this repo already exists
+        repoVisibility: public
+        defaultBranch: main  # Ensure default branch is set to 'main'
+        branch: dev  # Target branch to commit the changes
+        skipGitValidation: true # Skip GitHub validations like branch protections
+        requireCodeOwnerReviews: false
+        permissions:
+          actions: write
+          contents: write
+
+    # Triggering GitHub Actions to create webapp resources
+    - id: github-action
+      name: Starting GitHub Action
+      action: github:actions:dispatch
+      input:
+        workflowId: terraform_dotnet.yml
+        repoUrl: ${{ parameters.repoUrl }}
+        branchOrTagName: 'main'
+        workflowInputs:
+          resourcetype: ${{ parameters.resourcetype }}
+          environment: ${{ parameters.environment }}
+          appname: ${{ parameters.appname }}
+
+    # Registering the new component in Backstage catalog
+    - id: register
+      name: Registering the new Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{steps['publish-temp'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  # Output links are displayed to the user after the template execution
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish-temp'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

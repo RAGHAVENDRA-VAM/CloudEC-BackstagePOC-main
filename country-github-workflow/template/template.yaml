@@ -1,0 +1,77 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: virtual-machine-webapp-template
+  title: Resources Provision Workflow
+  description: Trigger VM, WebApp deployment workflow in a repository with additional input parameters
+  tags: ['recommended']
+spec:
+  owner: github.com/prayankag
+  type: service
+  parameters:
+    - title: Workflow Invocation Input
+      required:
+        - repoUrl
+        - workflowId
+        - branchOrTagName
+        - orgname
+        - targetrepo
+        - resourcetype
+        - environment
+      properties:
+        repoUrl:
+          title: Repository URL
+          type: string
+          description: The URL of the GitHub repository containing the workflow
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+        workflowId:
+          title: Workflow File Name
+          type: string
+          description: The name of the GitHub Actions workflow file to trigger (e.g., `deploy.yml`)
+        branchOrTagName:
+          title: Branch or Tag
+          type: string
+          description: The branch or tag to use when invoking the workflow (e.g., `main`)
+        orgname:
+          title: The name of the target organisation repository
+          type: string
+          description: The name of the organisation repository
+        targetrepo:
+          title: The target repository for triggering workflows
+          type: string
+          description: The name of the target repository for triggering workflows
+        resourcetype:
+          title: resourcetype
+          type: string
+          description: resourcetype to deploy (e.g., VM , Webapp)
+        environment:
+          title: environment
+          type: string
+          description: Environment to deploy (e.g., dev, prod)
+          enum:
+            - dev
+            - stag
+            - prod
+  steps:
+    - id: github-action
+      name: Starting GitHub Action
+      action: github:actions:dispatch
+      input:
+        workflowId: ${{ parameters.workflowId }}
+        repoUrl: ${{ parameters.repoUrl }}
+        branchOrTagName: ${{ parameters.branchOrTagName }}
+        workflowInputs:
+          orgname: ${{ parameters.orgname }}
+          targetrepo: ${{ parameters.targetrepo }}
+          template: ${{ parameters.template }}
+          resourcetype: ${{ parameters.resourcetype }}
+          environment: ${{ parameters.environment }}
+  output:
+    links:
+      - title: Repository
+        url: 'https://github.com/Prayankag/AutomationRepos'
+      - title: GitHub Actions
+        url: 'https://github.com/Prayankag/AutomationRepos/actions'

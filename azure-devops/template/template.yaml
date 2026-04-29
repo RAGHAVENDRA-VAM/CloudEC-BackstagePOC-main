@@ -1,0 +1,84 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: azure-repo-demo
+  title: Azure Repository Test
+  description: Clone and push to an Azure repository example.
+spec:
+  owner: prayankagochipatula
+  type: service
+
+  parameters:
+    - title: Fill in some steps
+      required:
+        - name
+        - owner
+      properties:
+        name:
+          title: Project name
+          type: string
+          description: Choose a unique project name.
+          ui:field: EntityNamePicker
+          ui:autofocus: true
+        owner:
+          title: Owner
+          type: string
+          description: Select an owner for the Backstage component.
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+
+  steps:
+    - id: cloneAzureRepo
+      name: Clone Azure Repo
+      action: azure:repo:clone
+      input:
+        remoteUrl: "https://prayankagochipatula@dev.azure.com/prayankagochipatula/Backstage/_git/Backstage"
+        branch: "main"
+        targetPath: ./sub-directory
+
+    - id: fetch
+      name: Template Skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        targetPath: ./sub-directory
+        values:
+          name: ${{ parameters.name }}
+          owner: ${{ parameters.owner }}
+
+    - id: pushAzureRepo
+      name: Push to Remote Azure Repo
+      action: azure:repo:push
+      input:
+        branch: main
+        sourcePath: ./sub-directory
+        gitCommitMessage: Add ${{ parameters.name }} project files
+
+    - id: pullRequestAzureRepo
+      name: Create a Pull Request to Azure Repo
+      action: azure:repo:pr
+      input:
+        sourceBranch: main
+        targetBranch: "main"
+        repoId: Backstage
+        title: ${{ parameters.name }}
+        project: Backstage
+        organization: prayankagochipatula
+        supportsIterations: false
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: "dev.azure.com?owner=Backstage&repo=Backstage&organization=prayankagochipatula&version=main"
+        catalogInfoPath: "/catalog-info.yaml"
+
+  output:
+    links:
+      - title: Repository
+        url: "dev.azure.com?owner=Backstage&repo=Backstage&organization=prayankagochipatula"
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}

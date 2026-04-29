@@ -1,0 +1,54 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: trigger-azure-pipeline
+  title: Trigger Azure DevOps Pipeline
+  description: Template to trigger a pipeline in Azure DevOps
+  tags: ['azure', 'pipeline', 'devops']
+spec:
+  owner: prayankag
+  type: service
+  parameters:
+    - title: Azure Pipeline Trigger Inputs
+      required:
+        - organization
+        - project
+        - pipelineId
+        - branchName
+      properties:
+        organization:
+          title: Azure DevOps Organization
+          type: string
+          description: The Azure DevOps organization name (e.g., `my-org`)
+        project:
+          title: Azure DevOps Project
+          type: string
+          description: The Azure DevOps project name (e.g., `my-project`)
+        pipelineId:
+          title: Pipeline ID
+          type: string
+          description: The Azure DevOps pipeline ID to trigger
+        branchName:
+          title: Branch Name
+          type: string
+          description: The branch name to use when triggering the pipeline
+  steps:
+    - id: trigger-pipeline
+      name: Trigger Azure DevOps Pipeline
+      action: azure:pipeline:run
+      input:
+        organization: ${{ parameters.organization }}
+        project: ${{ parameters.project }}
+        pipelineId: ${{ parameters.pipelineId }}
+        branchName: ${{ parameters.branchName }}
+    - id: register
+      name: Registering the new Component 
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{steps['trigger-pipeline'].output.repoContentsUrl }}
+  output:
+    links:
+      - title: Azure DevOps Project
+        url: https://dev.azure.com/${{ parameters.organization }}/${{ parameters.project }}
+      - title: Azure Pipeline Logs
+        url: https://dev.azure.com/${{ parameters.organization }}/${{ parameters.project }}/_build?definitionId=${{ parameters.pipelineId }}

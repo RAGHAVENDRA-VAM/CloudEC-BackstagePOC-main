@@ -1,0 +1,166 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: ondemandwebapp
+  title: Create an Azure WebApp using Backstage
+  description: Create an Instance to deploy your application
+  tags: ['recommended', 'azure', 'webapp', 'dotnet']
+spec:
+  owner: github.com/prayankag
+  type: service
+  parameters:
+    - title: Backstage Input
+      required:
+        - name
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the Backstage catalog app
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        description:
+          title: A short description of the module - put full details in the README!
+          type: string
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+    - title: webapp deploy and Task Definition
+      required:
+         - resourcetype
+         - environment
+         - appname
+         - infraprovision
+         - webappdeployment
+      properties:
+        resourcetype:
+          title: resourcetype
+          type: string
+          description: resourcetype to deploy (e.g., VM , Webapp)
+        environment:
+          title: environment
+          type: string
+          description: Environment to deploy (e.g., dev, prod)
+          enum:
+            - dev
+            - stag
+            - prod
+        appname:
+          title: WebApp Name
+          type: string
+          description: WebApp name to deploy .Net application
+        infraprovision:
+          title: Infrastructure provision
+          type: boolean
+          default: false
+        webappdeployment:
+          title: Webapp deployment
+          type: boolean
+          default: false
+    - title: Choose a Repository Location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Location of the repository
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  steps:
+    # Fetching the template details
+    - id: fetch-base
+      name: Fetching Details from Content Folder
+      action: fetch:template
+      input:
+        # url: ./content
+        url: https://github.com/Prayankag/webappsmall/tree/main/
+        values:
+          name: ${{ parameters.name }}
+          owner: ${{ parameters.owner }}
+          description: ${{ parameters.description }}
+          repo_name: ${{ (parameters.repoUrl | parseRepoUrl)["repo"] }}
+          repo_owner: ${{ (parameters.repoUrl | parseRepoUrl)["owner"] }}
+          resourcetype: ${{ parameters.resourcetype }}
+          environment: ${{ parameters.environment }}
+          appname: ${{ parameters.appname }}
+          infraprovision: ${{ parameters.infraprovision }}
+          webappdeployment: ${{ parameters.webappdeployment }}
+    - id: generate-terraform-tfvars
+      name: Generate terraform.tfvars
+      if: ${{ parameters.infraprovision }}
+      run: |
+        echo "appname = \"${{ parameters.appname }}\"" >> .\terraform/environments\${{ parameters.environment }}\terraform.tfvars
+    # Publish the content to GitHub
+    - id: publish-temp
+      name: Publishing Details to main branch
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: This repo is to create a webapp ${{ parameters.appname }} using Backstage.
+        repoUrl: ${{ parameters.repoUrl }}  # Ensure this repo already exists
+        repoVisibility: public
+        defaultBranch: main  # Ensure default branch is set to 'main'
+        branch: dev  # Target branch to commit the changes
+        skipGitValidation: true # Skip GitHub validations like branch protections
+        requireCodeOwnerReviews: false
+        permissions:
+          actions: write
+          contents: write
+        collaborators:
+          - user: "Sapireddy555" 
+            access: Admin
+      
+    - id: kube-pr
+      name: "Open PR in GitOps Repository"
+      action: publish:github:pull-request
+      input:
+        repoUrl: ${{ parameters.repoUrl }}
+        branchName: dev
+        title: Create a pull request from dev to main
+        description: |
+          This repo is to create a webapp. ${{ steps.changed-files.outputs.fileList }}
+        targetBranch: main
+        reviewers:
+          - prayankag # Replace with the GitHub username of the reviewer
+        autoApprove: true # Automatically approve the PR
+
+    # Triggering GitHub Actions to create webapp resources
+    - id: github-action
+      name: Starting GitHub Action
+      action: github:actions:dispatch
+      input:
+        workflowId: main_template.yml
+        repoUrl: ${{ parameters.repoUrl }}
+        branchOrTagName: 'main'
+        workflowInputs:
+          resourcetype: ${{ parameters.resourcetype }}
+          environment: ${{ parameters.environment }}
+          appname: ${{ parameters.appname }}
+          infraprovision: ${{ parameters.infraprovision }}
+          webappdeployment: ${{ parameters.webappdeployment }}
+
+    # Registering the new component in Backstage catalog
+    - id: register
+      name: Registering the new Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{steps['publish-temp'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  # Output links are displayed to the user after the template execution
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish-temp'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

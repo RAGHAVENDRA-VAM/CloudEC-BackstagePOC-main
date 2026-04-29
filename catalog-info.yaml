@@ -1,0 +1,34 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: demo-backstage
+  description: An example of a Backstage application.
+  # Example for optional annotations
+  # annotations:
+  #   github.com/project-slug: backstage/backstage
+  #   backstage.io/techdocs-ref: dir:.
+spec:
+  type: website
+  owner: john@example.com
+  lifecycle: experimental
+  
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: prayanka.gochipatula
+  annotations:
+    microsoft.com/azure-active-directory/object-id: "0ca98645-9fc4-4a65-8164-2fa9f832ea34"
+spec:
+  profile:
+    displayName: Prayanka Gochipatula
+    email: prayanka.gochipatula@valuemomentum.net
+
+# Reference to additional entities
+---
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: examples-entities
+spec:
+  type: file
+  target: ./examples/entities.yaml

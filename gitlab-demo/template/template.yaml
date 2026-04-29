@@ -1,0 +1,95 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: Create VM Resource
+  title: Create VM Resource Workflow
+  description: Trigger VM creation resource workflow in a repository with additional input parameters
+  tags: ['recommended']
+spec:
+  owner: github.com/prayankag
+  type: service
+  parameters:
+    - title: Workflow Invocation Input
+      required:
+        - repoUrl
+        - workflowId
+        - branchOrTagName
+        - orgName
+        - projectName
+        - azurePipelineName
+        - ResourceYamlFile
+        - Resourcegroup
+        - VMName
+        - OSType
+      properties:
+        repoUrl:
+          title: Repository URL
+          type: string
+          description: The URL of the GitHub repository containing the workflow
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+        workflowId:
+          title: Workflow File Name
+          type: string
+          description: The name of the GitHub Actions workflow file to trigger (e.g., `deploy.yml`)
+        branchOrTagName:
+          title: Branch or Tag
+          type: string
+          description: The branch or tag to use when invoking the workflow (e.g., `main`)
+        orgName:
+          title: Azure DevOps Organization Name
+          type: string
+          description: Enter your Azure DevOps Organization name
+          default: 'devopsokn'
+        projectName:
+          title: Azure DevOps Project Name
+          type: string
+          description: Enter your Azure DevOps Project name
+          default: 'MyPOC'
+        azurePipelineName:
+          title: Target Repository Name
+          type: string
+          description: Enter the azurePipelineName
+          default: 'test_Automation_Repo'
+        ResourceYamlFile:
+          title: Resource YAML File
+          type: string
+          description: Select the resource YAML file
+          enum:
+            - 'vm_provision.yaml'
+        Resourcegroup:
+          title: Resource Group
+          type: string
+          description: The resource group to be used
+        VMName:
+          title: VMName
+          type: string
+          description: The name of the virtual machine
+        OSType:
+          title: OSType
+          type: string
+          description: The operating system type for the VM (e.g., `Linux` or `Windows`)
+  steps:
+    - id: github-action
+      name: Starting GitHub Action
+      action: github:actions:dispatch
+      input:
+        workflowId: main.yaml
+        repoUrl: ${{ parameters.repoUrl }}
+        branchOrTagName: 'main'
+        workflowInputs:
+          orgName: ${{ parameters.orgName }}
+          projectName: ${{ parameters.projectName }}
+          azurePipelineName: ${{ parameters.azurePipelineName }}
+          ResourceYamlFile: ${{ parameters.ResourceYamlFile }}
+          resourceGroup: ${{ parameters.Resourcegroup }}
+          VMName: ${{ parameters.VMName }}
+          OSType: ${{ parameters.OSType }}
+  output:
+    links:
+      - title: Repository
+        url: 'https://github.com/Prayankag/git2ado'
+      - title: GitHub Actions
+        url: 'https://github.com/Prayankag/git2ado/actions'
