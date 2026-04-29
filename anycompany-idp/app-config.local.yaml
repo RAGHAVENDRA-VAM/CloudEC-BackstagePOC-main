@@ -60,9 +60,9 @@ integrations:
   - host: github.com
     # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
     # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
-    token: ''
+    token: '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'
   terraform:
-    token: ''
+    token: 'DgSKyL1fqQLDDQ.atlasv1.1iNGwAN6q9PrVIMiuyr7uz0G0IyRaaT4xzKSNvQ4uoqNCyvvbRvSrKwzZAIQpR8zmg8'
 
 server:
   port: 7007
@@ -76,8 +76,8 @@ auth:
     guest: {}
     github:
       development:
-        clientId: ''
-        clientSecret: ''
+        clientId: 'Ov23liMWNYruU95uy89o'
+        clientSecret: '194a416a948231114464d1abc4c3be184ffc1906'
         signIn:
           resolvers:
           # Matches the GitHub username with the Backstage user entity name.
@@ -145,4 +145,4 @@ techdocs:
       # if provided, takes higher priority, 'techdocs.publisher.azureBlobStorage.credentials' will become irrelevant
       credentials:
         accountName: 'anycompanydocs'
-        accountKey: ''
+        accountKey: 'lasw9dx0StxxmpSN3vjrovSDhmv7Nw++/YprY6EJoJopEPsnIuXZSkJ/hMCWeW64508hxpGk9MsI+ASt7af4AQ=='
