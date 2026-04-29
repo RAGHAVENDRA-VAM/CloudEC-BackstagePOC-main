@@ -123,7 +123,7 @@ catalog:
         project: DevOpsPractice
         repositoryPattern: '.*' # Matches all repositories
         branch: main # Default branch to fetch metadata from
-        token: ""
+        token: "3YLu5eUHYdqxjzoMpY1WZYzgNQ634GFeFmZPtuMLxiBLExsayvzRJQQJ99ALACAAAAAAhliiAAASAZDO5RhP"
 
     gitlab:
       yourProviderId:
