@@ -1,0 +1,37 @@
+name: Backstage Docker Build (Only)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      # 4. Build Backstage backend (IMPORTANT)
+      - name: Build Backstage
+        run: |
+          yarn tsc
+          yarn build:backend
+
+      # 5. Build Docker Image (NO PUSH)
+      - name: Build Docker Image
+        run: |
+          docker build -t backstage:local .
