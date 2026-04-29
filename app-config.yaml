@@ -51,7 +51,7 @@ backend:
 integrations:
   azure:
     - host: dev.azure.com
-      token: ""
+      token: "3YLu5eUHYdqxjzoMpY1WZYzgNQ634GFeFmZPtuMLxiBLExsayvzRJQQJ99ALACAAAAAAhliiAAASAZDO5RhP"
 
   github:
     - host: github.com
