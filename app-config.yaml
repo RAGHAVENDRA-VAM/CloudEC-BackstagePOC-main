@@ -57,7 +57,7 @@ integrations:
     - host: github.com
       # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
       # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
-      token: ""
+      token: "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"
     ### Example for how to add your GitHub Enterprise instance using the API:
     # - host: ghe.example.net
     #   apiBaseUrl: https://ghe.example.net/api/v3
@@ -65,7 +65,7 @@ integrations:
    
   gitlab:
     - host: gitlab.com
-      token: ""
+      token: "glpat-Foxzq3fCAr5-zfzJPGNV"
   
 proxy:
   '/api/auth/microsoft':
@@ -90,18 +90,18 @@ auth:
   providers:
     github:
       development:
-        clientId: ''
-        clientSecret: ''
+        clientId: '77964ceebb205edfda6f'
+        clientSecret: 'fea832189d1b019cd878b35186e5926b49d361a0'
         signIn:
           resolvers:
             - resolver: emailMatchingUserEntityProfileEmail
             - resolver: usernameMatchingUserEntityName
     microsoft:
       development:
-        clientId: 
-        clientSecret: 
-        tenantId: 
-        domainHint:
+        clientId: 4f6142c4-f114-48ae-9eaf-152ea5c628b1
+        clientSecret: 8Y38Q~Z2NALUvGb~RHzADYf6lLJkMzAkSoLqsc0z
+        tenantId: 5f3ec70f-0215-4f44-bdab-f5beda7cdd74
+        domainHint: 5f3ec70f-0215-4f44-bdab-f5beda7cdd74
         signIn:
           resolvers:
             - resolver: userIdMatchingUserEntityAnnotation
@@ -111,7 +111,7 @@ auth:
 
 scaffolder:
   secrets:
-    azurePat: ""
+    azurePat: "3YLu5eUHYdqxjzoMpY1WZYzgNQ634GFeFmZPtuMLxiBLExsayvzRJQQJ99ALACAAAAAAhliiAAASAZDO5RhP"
   workingDirectory: 'C:\Users\azureuser\demo-backstage\Temp\'
   
 catalog:
@@ -124,7 +124,7 @@ catalog:
         repositoryPattern: '.*' # Matches all repositories
         branch: main # Default branch to fetch metadata from
         token: ""
-8Y38Q
+
     gitlab:
       yourProviderId:
         host: gitlab.com
@@ -144,9 +144,9 @@ catalog:
       providerId:
         target: https://graph.microsoft.com/v1.0
         authority: https://login.microsoftonline.com
-        tenantId: 
-        clientId: 
-        clientSecret: 
+        tenantId: 5f3ec70f-0215-4f44-bdab-f5beda7cdd74
+        clientId: 4f6142c4-f114-48ae-9eaf-152ea5c628b1
+        clientSecret: 8Y38Q~Z2NALUvGb~RHzADYf6lLJkMzAkSoLqsc0z
         queryMode: advanced
   import:
     entityFilename: catalog-info.yaml
@@ -245,4 +245,3 @@ logging:
         filename: ./logs/backstage.log
         maxsize: 10485760 # 10 MB
         maxFiles: 5
-
