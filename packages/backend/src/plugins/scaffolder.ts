@@ -1,11 +1,12 @@
 import { createRouter } from '@backstage/plugin-scaffolder-backend';
-import { actions } from './scaffolder/actions/register';
+import { actions } from './scaffolder/register';
 
 export default async function createPlugin({
   logger,
   config,
   discovery,
   database,
+  reader,
   catalogClient,
 }: any) {
   return await createRouter({
@@ -13,6 +14,7 @@ export default async function createPlugin({
     config,
     discovery,
     database,
+    reader,
     catalogClient,
     actions,
   });
