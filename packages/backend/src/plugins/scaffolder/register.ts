@@ -1,4 +1,4 @@
-import { githubBranchAction } from './githubBranch';
+import { githubBranchAction } from './actions/githubBranch';
 
 export const actions = [
   // other actions

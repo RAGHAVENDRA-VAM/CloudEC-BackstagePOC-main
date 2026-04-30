@@ -55,11 +55,6 @@ import { TechDocsAddons } from '@backstage/plugin-techdocs-react';
 import { ReportIssue } from '@backstage/plugin-techdocs-module-addons-contrib';
 
 import {
-  EntityAzurePipelinesContent,
-  isAzureDevOpsAvailable,
-} from '@backstage-community/plugin-azure-devops';
-
-import {
   EntityKubernetesContent,
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
