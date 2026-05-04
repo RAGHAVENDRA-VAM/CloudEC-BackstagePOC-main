@@ -34,4 +34,4 @@ jobs:
       # 5. Build Docker Image (NO PUSH)
       - name: Build Docker Image
         run: |
-          docker build -t backstage:local .
+          docker build -t backstage:local -f packages/backend/Dockerfile .
