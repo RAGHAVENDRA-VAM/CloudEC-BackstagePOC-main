@@ -1,4 +1,4 @@
-name: Backstage Docker Build (Only)
+name: Backstage Docker Build and push to ACR
 
 on:
   push:
@@ -25,13 +25,36 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      # 4. Build Backstage backend (IMPORTANT)
+      # 4. Build Backstage backend
       - name: Build Backstage
         run: |
           yarn tsc
           yarn build:backend
 
-      # 5. Build Docker Image (NO PUSH)
+      # 5. Build Docker Image
       - name: Build Docker Image
         run: |
           docker build -t backstage:local -f packages/backend/Dockerfile .
+
+      # 6. Azure Login
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # 7. Login to ACR
+      - name: Login to Azure Container Registry
+        run: |
+          az acr login --name BackstageAcr12
+
+      # 8. Tag Docker Image
+      - name: Tag Docker Image
+        run: |
+          docker tag backstage:local BackstageAcr12.azurecr.io/backstage:latest
+
+      # 9. Push Docker Image to ACR
+      - name: Push Docker Image
+        run: |
+          docker push <YOUR_ACR_NAME>.azurecr.io/backstage:latest
