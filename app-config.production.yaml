@@ -17,18 +17,10 @@ backend:
   database:
     client: pg
     connection:
-      host: <azure-postgres-host>.postgres.database.azure.com
-      port: 5432
-      user: <username>@<azure-postgres-host>
-      password: <password>
-      ssl:
-        rejectUnauthorized: false
-      # For more SSL options, see: https://node-postgres.com/features/ssl
-      # You can set the sslmode configuration option via the `PGSSLMODE` environment variable
-      # Example host: myserver.postgres.database.azure.com
-      # ssl:
-      #   ca: # if you have a CA file and want to verify it you can uncomment this section
-      #     $file: <file-path>/ca/server.crt
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
 
 auth:
   providers:

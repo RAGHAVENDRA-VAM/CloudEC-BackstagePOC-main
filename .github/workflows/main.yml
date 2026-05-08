@@ -62,3 +62,16 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push backstageacr12.azurecr.io/backstage:latest
+
+      # 10. Set AKS Context
+      - name: Set AKS Context
+        uses: azure/aks-set-context@v4
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          cluster-name: your-aks-name
+          resource-group: your-rg
+
+      # 11. Deploy to AKS
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f kubernetes/
