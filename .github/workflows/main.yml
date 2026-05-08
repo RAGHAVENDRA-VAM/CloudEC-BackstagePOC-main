@@ -1,4 +1,4 @@
-name: Backstage Docker Build and push to ACR
+name: Backstage Docker Build and Push to ACR
 
 on:
   push:
@@ -51,15 +51,14 @@ jobs:
       # 7. Login to ACR
       - name: Login to Azure Container Registry
         run: |
-          az acr login --name BackstageAcr12
+          az acr login --name backstageacr12
 
       # 8. Tag Docker Image
       - name: Tag Docker Image
         run: |
-          docker tag backstage:local BackstageAcr12.azurecr.io/backstage:latest
+          docker tag backstage:local backstageacr12.azurecr.io/backstage:latest
 
       # 9. Push Docker Image to ACR
       - name: Push Docker Image
         run: |
-          docker push BackstageAcr12.azurecr.io/backstage:latest
-          
+          docker push backstageacr12.azurecr.io/backstage:latest
